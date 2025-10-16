@@ -1,5 +1,5 @@
 # Ignore everything in this directory
-*
+.gitignore
 # But do not ignore this .gitignore file
 !mediamtx.template
 !.gitignore

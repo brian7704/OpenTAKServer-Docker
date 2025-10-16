@@ -1,6 +1,7 @@
 # Ignore everything in this directory
-*
+ca
 # But do not ignore this .gitignore file
 !ca
 !mediamtx
 !.gitignore
+!configs

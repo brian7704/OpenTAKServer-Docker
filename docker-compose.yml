@@ -10,7 +10,7 @@ services:
     ports:
       - "8081:8081" # OTS listens on this port on the loopback interface for HTTP(S) requests
     volumes:
-      - "./persistent/ots:/app/ots:rw"
+      - "./ots:/app/ots:rw"
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -37,7 +37,7 @@ services:
     healthcheck:
       disable: true
     volumes:
-      - "./persistent/ots:/app/ots:rw"
+      - "./ots:/app/ots:rw"
     depends_on:
       ots:
         condition: service_healthy
@@ -59,7 +59,7 @@ services:
     healthcheck:
       disable: true
     volumes:
-      - "./persistent/ots:/app/ots:rw"
+      - "./ots:/app/ots:rw"
     environment:
       SQLALCHEMY_DATABASE_URI: postgresql+psycopg://ots:password@ots-db/ots
       OTS_RABBITMQ_SERVER_ADDRESS: rabbitmq
@@ -78,7 +78,7 @@ services:
     healthcheck:
       disable: true
     volumes:
-      - "./persistent/ots:/app/ots"
+      - "./ots:/app/ots"
     environment:
       SQLALCHEMY_DATABASE_URI: postgresql+psycopg://ots:password@ots-db/ots
       OTS_RABBITMQ_SERVER_ADDRESS: rabbitmq
@@ -95,7 +95,7 @@ services:
   nginx-proxy:
     build:
       context: .
-      dockerfile: persistent/nginx/Dockerfile
+      dockerfile: ots/configs/nginx/Dockerfile
     container_name: nginx-proxy
     hostname: nginx-proxy
     restart: unless-stopped
@@ -107,8 +107,8 @@ services:
       - "0.0.0.0:8446:8446" # Proxy for certificate enrollment to OpenTAKServer port 8081
       - "0.0.0.0:8883:8883" # Proxy for MQTT / Meshtastic to Rabbitmq port 1883
     volumes:
-      - "./persistent/ots/ca:/app/ots/ca:ro"
-      - "./persistent/nginx/templates:/etc/nginx/templates:ro"
+      - "./ots/ca:/app/ots/ca:ro"
+      - "./ots/configs/nginx/templates:/etc/nginx/templates:ro"
     depends_on:
       ots:
         condition: service_healthy
@@ -120,8 +120,8 @@ services:
     restart: unless-stopped
     volumes:
       - "/etc/timezone:/etc/timezone:ro"
-      - "./persistent/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro"
-      - "./persistent/rabbitmq/99-opentakserver.conf:/etc/rabbitmq/conf.d/99-opentakserver.conf:ro"
+      - "./ots/configs/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro"
+      - "./ots/configs/rabbitmq/99-opentakserver.conf:/etc/rabbitmq/conf.d/99-opentakserver.conf:ro"
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 30s
@@ -146,8 +146,8 @@ services:
       - "0.0.0.0:8889:8889" # WebRTC streams
       - "0.0.0.0:8890:8890/udp" # SRT streams
     volumes:
-      - "./persistent/ots:/app/ots"
-      - "./persistent/ots/mediamtx/mediamtx.yml:/mediamtx.yml"
+      - "./ots:/app/ots"
+      - "./ots/mediamtx/mediamtx.yml:/mediamtx.yml"
     depends_on:
       ots:
         condition: service_healthy
@@ -163,8 +163,7 @@ services:
       POSTGRES_DB: ots
       PGUSER: ots
     volumes:
-      - "./persistent/db:/app/ots"
-      - "./persistent/ots/pgdata:/var/lib/postgresql"
+      - "./ots/pgdata:/var/lib/postgresql"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 1s
