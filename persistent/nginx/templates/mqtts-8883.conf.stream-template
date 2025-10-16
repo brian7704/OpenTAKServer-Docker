@@ -1,0 +1,12 @@
+#******************************************************
+#   RabbitMQ
+#   Port: 8883
+#******************************************************
+server {
+    listen     8883 ssl;
+
+    proxy_pass rabbitmq:1883;
+
+    # OpenTakServer certificates
+    include includes.d/opentakserver_certificate;
+}
