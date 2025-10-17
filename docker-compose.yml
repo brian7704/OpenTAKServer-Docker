@@ -29,7 +29,7 @@ services:
     hostname: ots-cot_parser
     restart: unless-stopped
     tty: true
-    command: python3 /app/.opentakserver_venv/bin/cot_parser
+    command: python3 /app/venv/bin/cot_parser
     healthcheck:
       disable: true
     volumes:
@@ -47,7 +47,7 @@ services:
     hostname: ots_eud_handler
     restart: unless-stopped
     tty: true
-    command: python3 /app/.opentakserver_venv/bin/eud_handler
+    command: python3 /app/venv/bin/eud_handler
     ports:
       - "0.0.0.0:8088:8088" # TCP CoT streaming port
     healthcheck:
