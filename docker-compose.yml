@@ -1,6 +1,8 @@
 services:
   ots:
-    image: ghcr.io/brian7704/opentakserver:master
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: opentakserver
     hostname: opentakserver
     restart: unless-stopped
@@ -9,6 +11,7 @@ services:
       - "8081:8081" # OTS listens on this port on the loopback interface for HTTP(S) requests
     volumes:
       - "./ots:/app/ots:rw"
+      - "./.opentakserver_venv:/app/venv/:rw"
     depends_on:
       rabbitmq:
         condition: service_healthy
