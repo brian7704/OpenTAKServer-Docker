@@ -20,11 +20,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 60s
-    environment:
-      SQLALCHEMY_DATABASE_URI: postgresql+psycopg://ots:password@ots-db/ots
-      OTS_RABBITMQ_SERVER_ADDRESS: rabbitmq
-      OTS_LISTENER_ADDRESS: 0.0.0.0
-      OTS_MEDIAMTX_API_ADDRESS: http://mediamtx:9997
+    env_file: ots_config.env
 
   ots_cot_parser:
     image: ghcr.io/brian7704/ots_cot_parser:master
@@ -40,9 +36,7 @@ services:
     depends_on:
       ots:
         condition: service_healthy
-    environment:
-      SQLALCHEMY_DATABASE_URI: postgresql+psycopg://ots:password@ots-db/ots
-      OTS_RABBITMQ_SERVER_ADDRESS: rabbitmq
+    env_file: ots_config.env
 
   ots_eud_handler:
     image: ghcr.io/brian7704/ots_eud_handler:master
@@ -57,9 +51,7 @@ services:
       disable: true
     volumes:
       - "./ots:/app/ots:rw"
-    environment:
-      SQLALCHEMY_DATABASE_URI: postgresql+psycopg://ots:password@ots-db/ots
-      OTS_RABBITMQ_SERVER_ADDRESS: rabbitmq
+    env_file: ots_config.env
 
   ots_eud_handler_ssl:
     image: ghcr.io/brian7704/ots_eud_handler_ssl:master
@@ -74,9 +66,7 @@ services:
       disable: true
     volumes:
       - "./ots:/app/ots"
-    environment:
-      SQLALCHEMY_DATABASE_URI: postgresql+psycopg://ots:password@ots-db/ots
-      OTS_RABBITMQ_SERVER_ADDRESS: rabbitmq
+    env_file: ots_config.env
     depends_on:
       ots:
         condition: service_healthy
@@ -150,11 +140,7 @@ services:
     container_name: ots-db
     hostname: ots-db
     restart: unless-stopped
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: ots
-      POSTGRES_DB: ots
-      PGUSER: ots
+    env_file: ots_config.env
     volumes:
       - "./ots/pgdata:/var/lib/postgresql"
     healthcheck:
