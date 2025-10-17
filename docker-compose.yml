@@ -1,8 +1,6 @@
 services:
   ots:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/brian7704/opentakserver:master
     container_name: opentakserver
     hostname: opentakserver
     restart: unless-stopped
@@ -26,9 +24,7 @@ services:
       OTS_LISTENER_ADDRESS: 0.0.0.0
 
   ots_cot_parser:
-    build:
-      context: ./opentakserver/cot_parser/
-      dockerfile: Dockerfile
+    image: ghcr.io/brian7704/ots_cot_parser:master
     container_name: ots_cot_parser
     hostname: ots-cot_parser
     restart: unless-stopped
@@ -46,9 +42,7 @@ services:
       OTS_RABBITMQ_SERVER_ADDRESS: rabbitmq
 
   ots_eud_handler:
-    build:
-      context: ./opentakserver/eud_handler/
-      dockerfile: Dockerfile
+    image: ghcr.io/brian7704/ots_eud_handler:master
     container_name: ots_eud_handler
     hostname: ots_eud_handler
     restart: unless-stopped
@@ -65,9 +59,7 @@ services:
       OTS_RABBITMQ_SERVER_ADDRESS: rabbitmq
 
   ots_eud_handler_ssl:
-    build:
-      context: ./opentakserver/eud_handler/
-      dockerfile: Dockerfile-ssl
+    image: ghcr.io/brian7704/ots_eud_handler_ssl:master
     container_name: ots_eud_handler_ssl
     hostname: ots_eud_handler_ssl
     restart: unless-stopped
