@@ -12,6 +12,8 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+      mediamtx:
+        condition: service_started
     healthcheck:
       test: curl --fail http://localhost:8081/api/health || exit 1
       interval: 60s
@@ -22,6 +24,7 @@ services:
       SQLALCHEMY_DATABASE_URI: postgresql+psycopg://ots:password@ots-db/ots
       OTS_RABBITMQ_SERVER_ADDRESS: rabbitmq
       OTS_LISTENER_ADDRESS: 0.0.0.0
+      OTS_MEDIAMTX_API_ADDRESS: http://mediamtx:9997
 
   ots_cot_parser:
     image: ghcr.io/brian7704/ots_cot_parser:master
@@ -137,12 +140,10 @@ services:
       - "0.0.0.0:8888:8888" # HLS video streams
       - "0.0.0.0:8889:8889" # WebRTC streams
       - "0.0.0.0:8890:8890/udp" # SRT streams
+      - "0.0.0.0:9997:9997" # MediaMTX API
     volumes:
       - "./ots:/app/ots"
       - "./ots/mediamtx/mediamtx.yml:/mediamtx.yml"
-    depends_on:
-      ots:
-        condition: service_healthy
 
   ots-db:
     image: postgis/postgis:18-3.6
