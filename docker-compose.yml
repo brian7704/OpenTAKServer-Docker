@@ -11,7 +11,7 @@ services:
       - "8081:8081" # OTS listens on this port on the loopback interface for HTTP(S) requests
     volumes:
       - "./ots:/app/ots:rw"
-      - "./.opentakserver_venv:/app/venv/:rw"
+      #- "./.opentakserver_venv:/app/venv/:rw"
     depends_on:
       rabbitmq:
         condition: service_healthy
