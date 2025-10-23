@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - dockerfile: ./ots/nginx/Dockerfile
+          - dockerfile: ./ots/configs/nginx/Dockerfile
             image: ghcr.io/brian7704/opentakserver-ui
     permissions:
       contents: read
