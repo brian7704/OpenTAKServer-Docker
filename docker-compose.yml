@@ -82,7 +82,7 @@ services:
   nginx-proxy:
     build:
       context: .
-      dockerfile: persistent/nginx/Dockerfile
+      dockerfile: ots/configs/nginx/Dockerfile
     container_name: nginx-proxy
     hostname: nginx-proxy
     restart: unless-stopped
