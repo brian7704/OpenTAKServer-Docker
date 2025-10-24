@@ -95,6 +95,12 @@ services:
       ots:
         condition: service_healthy
 
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./ots/configs/nginx/certbot/:/var/www/certbot/:rw
+      - ./ots/configs/nginx/certbot/letsencrypt/:/etc/letsencrypt/:rw
+
   rabbitmq:
     image: rabbitmq:latest
     container_name: rabbitmq
