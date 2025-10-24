@@ -75,11 +75,16 @@ services:
         condition: service_healthy
 
   ots-webui:
-    build:
-      context: .
-      dockerfile: ots/configs/nginx/Dockerfile
+    image: ghcr.io/brian7704/opentakserver-ui:master
     container_name: ots-webui
     hostname: opentakserver-webui
+
+  nginx-proxy:
+    build:
+      context: .
+      dockerfile: persistent/nginx/Dockerfile
+    container_name: nginx-proxy
+    hostname: nginx-proxy
     restart: unless-stopped
     ports:
       - "0.0.0.0:80:80" # HTTP Web UI
@@ -91,6 +96,8 @@ services:
     volumes:
       - "./ots/ca:/app/ots/ca:ro"
       - "./ots/configs/nginx/templates:/etc/nginx/templates:ro"
+      - ./ots/configs/nginx/letsencrypt/www:/var/www/certbot/:rw
+      - ./ots/configs/nginx/letsencrypt/certs/:/etc/letsencrypt/:rw
     depends_on:
       ots:
         condition: service_healthy
@@ -98,8 +105,8 @@ services:
   certbot:
     image: certbot/certbot:latest
     volumes:
-      - ./ots/configs/nginx/certbot/:/var/www/certbot/:rw
-      - ./ots/configs/nginx/certbot/letsencrypt/:/etc/letsencrypt/:rw
+      - ./ots/configs/nginx/letsencrypt/www:/var/www/certbot/:rw
+      - ./ots/configs/nginx/letsencrypt/certs/:/etc/letsencrypt/:rw
 
   rabbitmq:
     image: rabbitmq:latest

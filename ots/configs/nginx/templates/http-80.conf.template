@@ -22,10 +22,14 @@ server {
         return 200 '{"status":"healthy"}';
     }
 
-    # Redirect the UI to HTTPS
-    if ($server_port = 80) {
-        return 301 https://$host$request_uri;
+    location /.well-known {
+        root /var/www/certbot;
     }
+
+    # Redirect the UI to HTTPS
+    #if ($server_port = 80) {
+    #    return 301 https://$host$request_uri;
+    #}
 
     #******************************************************
     #       OpenTakServer WebUI
