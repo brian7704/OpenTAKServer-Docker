@@ -75,17 +75,11 @@ services:
         condition: service_healthy
 
   ots-webui:
-    image: ghcr.io/brian7704/opentakserver-ui:master
-    container_name: ots-webui
-    hostname: opentakserver-webui
-    restart: unless-stopped
-
-  nginx-proxy:
     build:
       context: .
       dockerfile: ots/configs/nginx/Dockerfile
-    container_name: nginx-proxy
-    hostname: nginx-proxy
+    container_name: ots-webui
+    hostname: opentakserver-webui
     restart: unless-stopped
     ports:
       - "0.0.0.0:80:80" # HTTP Web UI

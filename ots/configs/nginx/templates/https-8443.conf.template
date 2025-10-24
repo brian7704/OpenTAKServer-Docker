@@ -4,7 +4,7 @@
 #******************************************************
 server {
     listen 8443 ssl;
-    server_name _;
+    server_name ${OTS_FQDN};
 
     client_max_body_size ${CLIENT_MAX_BODY_SIZE};
 

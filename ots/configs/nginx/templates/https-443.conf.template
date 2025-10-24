@@ -4,6 +4,7 @@
 #******************************************************
 server {
     listen 443 ssl;
+    server_name ${OTS_FQDN};
     server_name _;
     root /usr/share/nginx/html;
 

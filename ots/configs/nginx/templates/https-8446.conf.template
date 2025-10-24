@@ -4,7 +4,7 @@
 #******************************************************
 server {
     listen 8446 ssl;
-    server_name _;
+    server_name ${OTS_FQDN};
 
     # OpenTakServer certificates
     include includes.d/opentakserver_certificate;
