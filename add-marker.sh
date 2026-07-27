@@ -1,6 +1,54 @@
 #!/usr/bin/env bash
+#
 # Create a marker on the OpenTAKServer map via POST /api/markers.
-# The marker is broadcast to connected TAK clients and stored in the DB.
+# The marker is stored in the DB and broadcast to connected TAK clients.
+#
+# ------------------------------------------------------------------------------
+# EXAMPLES
+# ------------------------------------------------------------------------------
+#
+#   Create an unknown-ground marker (type defaults to a-u-G):
+#     ./add-marker.sh -n "Waypoint 1" -a 52.2297 -o 21.0122
+#
+#   Create a friendly marker (blue icon on the client):
+#     ./add-marker.sh -n "OP North" -a 52.2297 -o 21.0122 -t a-f-G-U-C
+#
+#   Create a hostile marker (red icon):
+#     ./add-marker.sh -n "Contact" -a 52.3100 -o 21.1100 -t a-h-G
+#
+#   List every marker currently on the map (paginated, 10 per page):
+#     ./add-marker.sh -l
+#
+#   Move or rename an existing marker by reusing its UID. This updates the
+#   marker in place rather than creating a duplicate:
+#     ./add-marker.sh -n "OP North" -a 52.4000 -o 21.0122 -t a-f-G-U-C \
+#         -u 10e99852-26f2-454f-9acb-86da78f46cf9
+#
+#   Delete a marker:
+#     ./add-marker.sh -d 10e99852-26f2-454f-9acb-86da78f46cf9
+#
+#   Target a different server, or use different credentials, without editing
+#   this file:
+#     OTS_HOST=10.0.0.5 ./add-marker.sh -n Rally -a 52.1 -o 21.0
+#     OTS_USER=alice OTS_PASS=hunter2 ./add-marker.sh -n Rally -a 52.1 -o 21.0
+#
+#   Drop a row of markers from a loop:
+#     for i in 1 2 3; do
+#         ./add-marker.sh -n "Checkpoint $i" -a "52.2$i" -o 21.01
+#     done
+#
+#   Print the full option reference:
+#     ./add-marker.sh -h
+#
+# ------------------------------------------------------------------------------
+# NOTES
+# ------------------------------------------------------------------------------
+#
+#   - UIDs must be UUID4; the script generates one unless you pass -u.
+#   - Markers go stale on clients 24h after creation (server-side default).
+#   - A client must be connected when the marker is created to receive it;
+#     replay-on-connect for pre-existing markers is untested.
+#
 set -euo pipefail
 
 OTS_HOST="${OTS_HOST:-192.168.1.29}"
