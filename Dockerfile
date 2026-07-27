@@ -13,8 +13,15 @@ RUN chown -R ots:ots /app
 RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 
-# TODO: Install from PyPI
-RUN pip install git+https://github.com/brian7704/OpenTAKServer.git
+# Pinned to a tagged release. Unpinned git HEAD ships mid-development
+# snapshots; 1.7.11 is the highest version with matching ghcr handler images.
+RUN pip install opentakserver==1.7.11
+
+# Fix two upstream 1.7.11 bugs that stop CoT reaching clients. See the script
+# for details; it fails the build if either anchor is missing, so a version bump
+# cannot silently drop a patch.
+COPY --chown=ots:ots patches/fix_eud_handler.py /tmp/fix_eud_handler.py
+RUN python3 /tmp/fix_eud_handler.py
 
 RUN /app/venv/bin/flask --app /app/venv/lib/python3.13/site-packages/opentakserver/app.py ots create-ca
 #RUN /app/venv/bin/flask --app /app/venv/lib/python3.13/site-packages/opentakserver/app.py db upgrade

@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: ots-local:1.7.11
     container_name: opentakserver
     hostname: opentakserver
     restart: unless-stopped
@@ -26,12 +27,18 @@ services:
     env_file: ots_config.env
 
   ots_cot_parser:
-    image: ghcr.io/brian7704/ots_cot_parser:master
+    # The ghcr ots_* images are stale 1.5.14 builds regardless of their tag, and
+    # ship the old client_controller.py that binds a 'cot' exchange the 1.7.x core
+    # no longer creates. Use the locally-built image so handlers match the core.
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ots-local:1.7.11
     container_name: ots_cot_parser
     hostname: ots-cot_parser
     restart: unless-stopped
     tty: true
-    command: python3 /app/venv/bin/cot_parser
+    entrypoint: ["python3", "/app/venv/bin/cot_parser"]
     healthcheck:
       disable: true
     volumes:
@@ -42,12 +49,15 @@ services:
     env_file: ots_config.env
 
   ots_eud_handler:
-    image: ghcr.io/brian7704/ots_eud_handler:master
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ots-local:1.7.11
     container_name: ots_eud_handler
     hostname: ots_eud_handler
     restart: unless-stopped
     tty: true
-    command: python3 /app/venv/bin/eud_handler
+    entrypoint: ["python3", "/app/venv/bin/eud_handler"]
     ports:
       - "0.0.0.0:8088:8088" # TCP CoT streaming port
     healthcheck:
@@ -57,12 +67,15 @@ services:
     env_file: ots_config.env
 
   ots_eud_handler_ssl:
-    image: ghcr.io/brian7704/ots_eud_handler_ssl:master
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ots-local:1.7.11
     container_name: ots_eud_handler_ssl
     hostname: ots_eud_handler_ssl
     restart: unless-stopped
     tty: true
-    command: python3 /app/venv/bin/eud_handler --ssl
+    entrypoint: ["python3", "/app/venv/bin/eud_handler", "--ssl"]
     ports:
       - "0.0.0.0:8089:8089" # SSL CoT streaming port
     healthcheck:
@@ -76,6 +89,7 @@ services:
 
   ots-webui:
     image: ghcr.io/brian7704/opentakserver-ui:master
+    platform: linux/amd64 # published for amd64 only, runs emulated
     container_name: ots-webui
     hostname: opentakserver-webui
 
@@ -146,7 +160,9 @@ services:
       - "./ots/mediamtx/mediamtx.yml:/mediamtx.yml"
 
   ots-db:
-    image: postgis/postgis:18-3.6
+    # postgis/postgis publishes amd64 only; imresamu/postgis is the PostGIS
+    # project's multi-arch companion build of the same recipe.
+    image: imresamu/postgis:18-3.6
     container_name: ots-db
     hostname: ots-db
     restart: unless-stopped
