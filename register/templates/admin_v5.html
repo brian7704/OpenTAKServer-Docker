@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}審核台 · Taya TAK{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='groups_v5.css') }}">
+<section class="admin-head"><div><p class="eyebrow">ADMIN REVIEW</p><h1>帳號申請審核</h1></div><form method="post" action="{{ url_for('admin_logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="secondary" type="submit">安全登出</button></form></section>
+<section class="panel">
+  <h2>註冊群組管理</h2>
+  <p>publicuser 為預設群組。公開群組可在註冊頁下拉選擇；非公開群組只接受手填名稱申請或管理員指派。所有加入申請都須經審核。</p>
+  <form method="post" action="{{ url_for('manage_group') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>新增或修改群組名稱<input name="name" maxlength="48" required placeholder="例如 MNDuser" list="admin-group-names"></label>
+    <label>說明<input name="description" maxlength="200" placeholder="選填"></label>
+    <label class="consent"><input type="checkbox" name="listed" value="1" checked><span>在註冊頁公開列出供下拉選擇</span></label>
+    <button class="primary" type="submit">儲存群組</button>
+  </form>
+  <datalist id="admin-group-names">{% for group in groups %}<option value="{{ group.name }}">{% endfor %}</datalist>
+  <ul>{% for group in groups %}<li><strong>{{ group.name }}</strong> · {{ '公開下拉選擇' if group.listed else '手填申請／管理員指派' }}{% if group.description %} · {{ group.description }}{% endif %}</li>{% endfor %}</ul>
+</section>
+<section class="queue">
+{% for item in applications %}
+<article class="request-card">
+  <div><span class="badge {{ item.status }}">{{ {'pending':'待審核','approved':'已核准','rejected':'已拒絕'}[item.status] }}</span><h2>{{ item.callsign }}</h2><p class="mono">{{ item.username }}</p><p class="mono">{{ item.email or '未留信箱（舊申請）' }}</p><p>申請群組：<strong>{{ item.requested_group }}</strong>（{{ '手填名稱' if item.group_mode == 'manual' else '公開選擇' }}）{% if item.assigned_group %}<br>管理員指定群組：<strong>{{ item.assigned_group }}</strong>{% endif %}</p></div>
+  {% if item.status == 'pending' %}
+  <div class="actions">
+    <form method="post" action="{{ url_for('approve', application_id=item.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>核准加入的群組<select name="assigned_group" required>
+        <option value="{{ item.requested_group }}">{{ item.requested_group }}（申請群組；未成立時核准後建立為非公開）</option>
+        {% for group in groups if group.name != item.requested_group %}<option value="{{ group.name }}">{{ group.name }} · {{ '公開' if group.listed else '非公開' }}</option>{% endfor %}
+      </select></label>
+      <button class="primary" type="submit">核准、加入群組並產生設定包</button>
+    </form>
+    <form class="reject-form" method="post" action="{{ url_for('reject', application_id=item.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input name="note" maxlength="200" placeholder="拒絕原因（選填）"><button class="danger" type="submit">拒絕</button></form>
+  </div>
+  {% elif item.status == 'approved' %}
+  <form method="post" action="{{ url_for('assign_group', application_id=item.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>管理員另行指派群組<input name="assigned_group" maxlength="48" required list="admin-group-names" placeholder="選擇或填寫群組名稱"></label>
+    <small>加入新群組會保留既有成員資格；未成立的群組會建立為非公開。</small>
+    <button class="secondary" type="submit">指派加入群組</button>
+  </form>
+  {% else %}<p class="muted">此申請已完成處理。</p>{% endif %}
+</article>
+{% else %}<div class="empty">目前沒有帳號申請。</div>{% endfor %}
+</section>
+{% endblock %}

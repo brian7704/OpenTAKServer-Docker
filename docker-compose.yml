@@ -1,161 +1,160 @@
+name: synology-opentak
+
 services:
-  ots:
+  opentakserver:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./opentakserver
     container_name: opentakserver
     hostname: opentakserver
     restart: unless-stopped
     tty: true
+    env_file: .env
     ports:
-      - "8081:8081" # OTS listens on this port on the loopback interface for HTTP(S) requests
+      - "${OTS_API_PORT:-8081}:8081"
     volumes:
-      - "./ots:/app/ots:rw"
-      #- "./.opentakserver_venv:/app/venv/:rw"
+      - ./data/ots:/app/ots:rw
     depends_on:
       rabbitmq:
+        condition: service_healthy
+      database:
         condition: service_healthy
       mediamtx:
         condition: service_started
     healthcheck:
-      test: curl --fail http://localhost:8081/api/health || exit 1
+      test: ["CMD-SHELL", "curl --fail http://localhost:8081/api/health || exit 1"]
       interval: 60s
       timeout: 5s
-      retries: 3
-      start_period: 60s
-    env_file: ots_config.env
+      retries: 5
+      start_period: 90s
 
-  ots_cot_parser:
+  cot-parser:
     image: ghcr.io/brian7704/ots_cot_parser:master
-    container_name: ots_cot_parser
-    hostname: ots-cot_parser
+    container_name: ots-cot-parser
     restart: unless-stopped
-    tty: true
     command: python3 /app/venv/bin/cot_parser
     healthcheck:
       disable: true
+    env_file: .env
     volumes:
-      - "./ots:/app/ots:rw"
+      - ./data/ots:/app/ots:rw
     depends_on:
-      ots:
+      opentakserver:
         condition: service_healthy
-    env_file: ots_config.env
 
-  ots_eud_handler:
+  eud-handler:
     image: ghcr.io/brian7704/ots_eud_handler:master
-    container_name: ots_eud_handler
-    hostname: ots_eud_handler
+    container_name: ots-eud-handler
     restart: unless-stopped
-    tty: true
     command: python3 /app/venv/bin/eud_handler
-    ports:
-      - "0.0.0.0:8088:8088" # TCP CoT streaming port
     healthcheck:
       disable: true
+    env_file: .env
     volumes:
-      - "./ots:/app/ots:rw"
-    env_file: ots_config.env
+      - ./data/ots:/app/ots:rw
+    ports:
+      - "${OTS_COT_PORT:-8088}:8088"
 
-  ots_eud_handler_ssl:
+  eud-handler-ssl:
     image: ghcr.io/brian7704/ots_eud_handler_ssl:master
-    container_name: ots_eud_handler_ssl
-    hostname: ots_eud_handler_ssl
+    container_name: ots-eud-handler-ssl
     restart: unless-stopped
-    tty: true
     command: python3 /app/venv/bin/eud_handler --ssl
-    ports:
-      - "0.0.0.0:8089:8089" # SSL CoT streaming port
     healthcheck:
       disable: true
+    env_file: .env
     volumes:
-      - "./ots:/app/ots"
-    env_file: ots_config.env
+      - ./data/ots:/app/ots:rw
+    ports:
+      - "${OTS_SSL_COT_PORT:-8089}:8089"
     depends_on:
-      ots:
+      opentakserver:
         condition: service_healthy
 
-  ots-webui:
+  webui:
     image: ghcr.io/brian7704/opentakserver-ui:master
     container_name: ots-webui
-    hostname: opentakserver-webui
+    restart: unless-stopped
 
-  nginx-proxy:
+  web-proxy:
     build:
       context: .
       dockerfile: ots/configs/nginx/Dockerfile
-    container_name: nginx-proxy
-    hostname: nginx-proxy
+    container_name: ots-web-proxy
     restart: unless-stopped
+    environment:
+      OTS_WEBUI_ADDRESS: webui
+      OTS_ADDRESS: opentakserver:8081
+      MTX_ADDRESS: mediamtx
     ports:
-      - "0.0.0.0:80:80" # HTTP Web UI
-      - "0.0.0.0:443:443" # HTTPS Web UI
-      - "0.0.0.0:8080:8080" # HTTP API requests to OpenTAKServer port 8081
-      - "0.0.0.0:8443:8443" # HTTPS API requests to OpenTAKServer port 8081
-      - "0.0.0.0:8446:8446" # Proxy for certificate enrollment to OpenTAKServer port 8081
-      - "0.0.0.0:8883:8883" # Proxy for MQTT / Meshtastic to Rabbitmq port 1883
+      - "${OTS_WEB_PORT:-8080}:80"
+      - "${OTS_HTTPS_PORT:-8443}:8443"
+      - "${OTS_ENROLLMENT_PORT:-8446}:8446"
     volumes:
-      - "./ots/ca:/app/ots/ca:ro"
-      - "./ots/configs/nginx/conf.d:/etc/nginx/conf.d:ro"
-      - ./ots/configs/nginx/letsencrypt/www:/var/www/certbot/:rw
-      - ./ots/configs/nginx/letsencrypt/certs/:/etc/letsencrypt/:rw
+      - ./data/ots/ca:/app/ots/ca:ro
     depends_on:
-      ots:
+      opentakserver:
         condition: service_healthy
 
-  certbot:
-    image: certbot/certbot:latest
+  register:
+    build:
+      context: ./register
+    container_name: opentak-register
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      OTS_BASE_URL: http://opentakserver:8081
+      DATA_DIR: /data
+    ports:
+      - "${REGISTER_PORT:-8787}:8080"
     volumes:
-      - ./ots/configs/nginx/letsencrypt/www:/var/www/certbot/:rw
-      - ./ots/configs/nginx/letsencrypt/certs/:/etc/letsencrypt/:rw
+      - ./data/register:/data:rw
+    depends_on:
+      opentakserver:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
 
   rabbitmq:
-    image: rabbitmq:latest
-    container_name: rabbitmq
-    hostname: rabbitmq
+    image: rabbitmq:4-management
+    container_name: ots-rabbitmq
     restart: unless-stopped
     volumes:
-      - "./ots/configs/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro"
-      - "./ots/configs/rabbitmq/99-opentakserver.conf:/etc/rabbitmq/conf.d/99-opentakserver.conf:ro"
+      - ./ots/configs/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+      - ./ots/configs/rabbitmq/99-opentakserver.conf:/etc/rabbitmq/conf.d/99-opentakserver.conf:ro
+      - ./data/rabbitmq:/var/lib/rabbitmq:rw
     healthcheck:
-      test: rabbitmq-diagnostics -q ping
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 30s
       timeout: 30s
-      retries: 3
+      retries: 5
 
   mediamtx:
     image: bluenviron/mediamtx:1.13.0-ffmpeg
-    container_name: mediamtx
-    hostname: mediamtx
+    container_name: ots-mediamtx
     restart: unless-stopped
-#    network_mode: host
     ports:
-      - "0.0.0.0:1935:1935" # RTMP video streams
-      - "0.0.0.0:1936:1936" # RTMPS video streams
-      - "0.0.0.0:8000:8000/udp" # RTP video streams
-      - "0.0.0.0:8001:8001/udp" # RTCP video streams
-      - "0.0.0.0:8189:8189/udp" # WebRTC
-      - "0.0.0.0:8322:8322" # RTSP(S) video streams
-      - "0.0.0.0:8554:8554" # RTSP video streams
-      - "0.0.0.0:8888:8888" # HLS video streams
-      - "0.0.0.0:8889:8889" # WebRTC streams
-      - "0.0.0.0:8890:8890/udp" # SRT streams
-      - "0.0.0.0:9997:9997" # MediaMTX API
+      - "${RTMP_PORT:-1935}:1935"
+      - "${RTP_PORT:-8000}:8000/udp"
+      - "${RTCP_PORT:-8001}:8001/udp"
+      - "${WEBRTC_UDP_PORT:-8189}:8189/udp"
+      - "${RTSP_PORT:-8554}:8554"
+      - "${HLS_PORT:-8888}:8888"
+      - "${WEBRTC_PORT:-8889}:8889"
+      - "${SRT_PORT:-8890}:8890/udp"
     volumes:
-      - "./ots:/app/ots"
-      - "./ots/mediamtx/mediamtx.yml:/mediamtx.yml"
+      - ./ots/mediamtx/mediamtx.yml:/mediamtx.yml:ro
 
-  ots-db:
+  database:
     image: postgis/postgis:18-3.6
-    container_name: ots-db
-    hostname: ots-db
+    container_name: ots-database
     restart: unless-stopped
-    env_file: ots_config.env
+    env_file: .env
     volumes:
-      - "./ots/pgdata:/var/lib/postgresql"
+      - ./data/postgres:/var/lib/postgresql:rw
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 1s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ots}"]
+      interval: 5s
       timeout: 5s
-      retries: 10
-    ports:
-      - "5432:5432"
+      retries: 20

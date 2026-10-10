@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block title %}管理員登入 · Taya TAK{% endblock %}
+{% block content %}<section class="narrow"><p class="eyebrow">ADMIN REVIEW</p><h1>管理員登入</h1><div class="panel"><p>使用 OpenTAK 管理員帳密登入，再完成兩步驟驗證。請先在 OpenTAK 管理介面綁定驗證器或啟用郵件驗證。</p><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>OpenTAK 管理員帳號<input name="username" autocomplete="username" required></label><label>密碼<input type="password" name="password" autocomplete="current-password" required></label><button class="primary" type="submit">下一步：驗證碼</button></form></div></section>{% endblock %}
+

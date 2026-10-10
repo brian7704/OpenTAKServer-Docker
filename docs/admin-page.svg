@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#07111f"/>
+  <rect x="48" y="34" width="1184" height="64" rx="16" fill="#10243d"/>
+  <text x="82" y="75" fill="#f7fbff" font-family="Arial,sans-serif" font-size="27" font-weight="700">TAYA TAK</text>
+  <text x="858" y="74" fill="#b8c8dc" font-family="Arial,sans-serif" font-size="18">註冊群組　待審核　已核准</text>
+  <text x="70" y="145" fill="#63d7ff" font-family="Arial,sans-serif" font-size="16" font-weight="700">ADMIN REVIEW</text>
+  <text x="70" y="188" fill="#ffffff" font-family="Arial,sans-serif" font-size="34" font-weight="700">帳號申請審核</text>
+  <rect x="70" y="218" width="1140" height="104" rx="18" fill="#10243d" stroke="#25496e"/>
+  <text x="102" y="255" fill="#ffffff" font-family="Arial,sans-serif" font-size="21" font-weight="700">註冊群組管理</text>
+  <rect x="102" y="270" width="420" height="34" rx="8" fill="#081626" stroke="#315c86"/>
+  <rect x="540" y="270" width="180" height="34" rx="8" fill="#19a6d2"/>
+  <text x="630" y="293" text-anchor="middle" fill="#04111d" font-family="Arial,sans-serif" font-size="15" font-weight="700">儲存群組</text>
+  <g font-family="Arial,sans-serif">
+    <rect x="70" y="350" width="1140" height="132" rx="18" fill="#10243d" stroke="#d99834"/>
+    <text x="102" y="383" fill="#ffbf58" font-size="15" font-weight="700">待審核</text>
+    <text x="102" y="420" fill="#ffffff" font-size="25" font-weight="700">DEMO-01</text>
+    <text x="300" y="420" fill="#c7d5e7" font-size="17">demo-user@example.com　申請群組：publicuser</text>
+    <rect x="876" y="390" width="292" height="48" rx="10" fill="#19a6d2"/>
+    <text x="1022" y="421" text-anchor="middle" fill="#04111d" font-size="16" font-weight="700">核准、加入群組並產生設定包</text>
+    <rect x="70" y="510" width="1140" height="132" rx="18" fill="#10243d" stroke="#25866d"/>
+    <text x="102" y="543" fill="#4de0ad" font-size="15" font-weight="700">已核准</text>
+    <text x="102" y="580" fill="#ffffff" font-size="25" font-weight="700">DEMO-02</text>
+    <text x="300" y="580" fill="#c7d5e7" font-size="17">approved-user@example.com　管理員指定群組：field-team</text>
+  </g>
+</svg>

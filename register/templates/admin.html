@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}審核台 · Taya TAK{% endblock %}
+{% block content %}
+<section class="admin-head"><div><p class="eyebrow">ADMIN REVIEW</p><h1>帳號申請審核</h1></div><form method="post" action="{{ url_for('admin_logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="secondary" type="submit">安全登出</button></form></section>
+<section class="queue">
+{% for item in applications %}<article class="request-card"><div><span class="badge {{ item.status }}">{{ {'pending':'待審核','approved':'已核准','rejected':'已拒絕'}[item.status] }}</span><h2>{{ item.callsign }}</h2><p class="mono">{{ item.username }}</p><p class="mono">{{ item.email or "未留信箱（舊申請）" }}</p></div>{% if item.status == 'pending' %}<div class="actions"><form method="post" action="{{ url_for('approve', application_id=item.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="primary" type="submit">核准並產生設定包</button></form><form class="reject-form" method="post" action="{{ url_for('reject', application_id=item.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input name="note" maxlength="200" placeholder="拒絕原因（選填）"><button class="danger" type="submit">拒絕</button></form></div>{% else %}<p class="muted">此申請已完成處理。</p>{% endif %}</article>{% else %}<div class="empty">目前沒有帳號申請。</div>{% endfor %}
+</section>
+{% endblock %}
+

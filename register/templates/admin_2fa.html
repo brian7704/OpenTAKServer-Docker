@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card narrow">
+  <h1>管理員兩步驟驗證</h1>
+  <p>{% if method == 'email' %}請輸入 OpenTAKServer 寄到信箱的驗證碼。{% else %}請輸入驗證器 App 顯示的驗證碼。{% endif %}驗證須在五分鐘內完成。</p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>驗證碼<input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="12" required autofocus></label>
+    <button class="button primary" type="submit">驗證並登入</button>
+  </form>
+  <p><a href="{{ url_for('admin_login') }}">重新登入</a></p>
+</section>
+{% endblock %}

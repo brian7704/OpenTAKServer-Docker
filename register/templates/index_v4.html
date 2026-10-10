@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="intro">
+  <div><p class="eyebrow">OPENTAK ACCESS</p><h1>申請 ATAK 連線帳號</h1><p>送出申請後由管理員審核。核准時系統會建立帳號並產生可直接匯入 ATAK 的完整設定包。</p></div>
+  <div class="server-card"><span>伺服器</span><strong>{{ public_host }}</strong><dl><dt>憑證註冊</dt><dd>{{ enrollment_port }} / TLS</dd><dt>安全連線</dt><dd>{{ stream_port }} / SSL</dd></dl></div>
+</section>
+
+<section class="workspace" id="apply">
+  <div class="panel form-panel">
+    <div class="section-heading"><span class="step">01</span><div><h2>填寫申請</h2><p>帳密用於申請查詢及核准後的 ATAK 憑證註冊。</p></div></div>
+    <form method="post" action="{{ url_for('apply') }}" autocomplete="off">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>使用者帳號<input name="username" minlength="3" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9_.-]{2,31}" autocomplete="username" required placeholder="例如 tayateam01"></label>
+      <label>ATAK 呼號<input name="callsign" minlength="2" maxlength="24" autocomplete="nickname" required placeholder="例如 ALPHA-01"></label>
+      <label>電子郵件
+        <input type="email" name="email" maxlength="254" autocomplete="email" required placeholder="name@example.com">
+        <small>核准或拒絕結果會寄到此信箱；核准信附上 ATAK 設定包。</small>
+      </label>
+      <label>密碼<input type="password" name="password" minlength="12" maxlength="72" autocomplete="new-password" required placeholder="至少 12 字元，不可含 @ 或 :"><small>須包含大小寫英文字母、數字與特殊符號；不可含 @ 或 :。用於建立帳號的加密密碼在審核後刪除。</small></label>
+      <label>再次輸入密碼<input type="password" name="confirm" minlength="12" maxlength="72" autocomplete="new-password" required></label>
+      <label class="consent"><input type="checkbox" required><span>我了解此服務僅供獲准人員使用，且不得轉交帳號或設定包。</span></label>
+      <button class="primary" type="submit">送出審核申請</button>
+    </form>
+  </div>
+  <aside class="panel process-panel"><div class="section-heading"><span class="step">02</span><div><h2>審核與下載</h2><p>使用申請帳號與密碼查詢結果及下載。</p></div></div><ol class="timeline"><li><strong>送出資料</strong><span>保存申請帳號與密碼。</span></li><li><strong>管理員審核</strong><span>審核期間不會建立 OpenTAK 帳號。</span></li><li><strong>下載設定包</strong><span>核准後會收到設定包附件，也可登入查詢頁隨時下載並匯入 ATAK。</span></li></ol><div class="notice">請妥善保管帳密、憑證與設定包，不得轉交他人。</div></aside>
+</section>
+
+<section class="guide" id="guide">
+  <div class="section-heading"><span class="step">03</span><div><h2>ATAK 建議設定</h2><p>優先使用完整設定包，避免手動輸入憑證。</p></div></div>
+  <div class="guide-grid">
+    <article><span class="num">1</span><h3>下載並匯入</h3><p>核准後下載 ZIP，不要解壓縮。在 ATAK 開啟「設定 → 匯入管理工具」，選取完整設定包。</p></article>
+    <article><span class="num">2</span><h3>確認連線</h3><p>到「設定 → 網路偏好設定 → TAK 伺服器」，確認伺服器為 <code>{{ public_host }}</code>、SSL 連接埠為 <code>{{ stream_port }}</code>。</p></article>
+    <article><span class="num">3</span><h3>首次啟用</h3><p>重新啟動 ATAK，允許憑證與網路權限。右下角連線圖示呈綠色後，即可傳送位置與訊息。</p></article>
+  </div>
+  <details><summary>若完整設定包無法匯入，改用帳密註冊</summary><div class="manual"><p>新增 TAK 伺服器：位址 <code>{{ public_host }}</code>、連接埠 <code>{{ stream_port }}</code>、啟用 SSL。再勾選「使用驗證」與「註冊用戶端憑證」，憑證註冊埠使用 <code>{{ enrollment_port }}</code>，輸入核准後的帳號密碼。</p><p>若顯示不受信任憑證，請停止操作並通知管理員，不要關閉憑證驗證。</p></div></details>
+</section>
+{% endblock %}
+

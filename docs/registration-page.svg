@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#07111f"/>
+  <rect x="48" y="34" width="1184" height="64" rx="16" fill="#10243d"/>
+  <text x="82" y="75" fill="#f7fbff" font-family="Arial,sans-serif" font-size="27" font-weight="700">TAYA TAK</text>
+  <text x="760" y="74" fill="#b8c8dc" font-family="Arial,sans-serif" font-size="18">申請帳號　查詢與下載　連線教學　管理審核</text>
+  <text x="640" y="155" text-anchor="middle" fill="#63d7ff" font-family="Arial,sans-serif" font-size="16" font-weight="700">ACCOUNT APPLICATION</text>
+  <text x="640" y="199" text-anchor="middle" fill="#ffffff" font-family="Arial,sans-serif" font-size="34" font-weight="700">申請 OpenTAK 帳號</text>
+  <rect x="285" y="235" width="710" height="410" rx="22" fill="#10243d" stroke="#25496e"/>
+  <g font-family="Arial,sans-serif" font-size="17" fill="#c7d5e7">
+    <text x="330" y="286">帳號</text><text x="655" y="286">呼號</text>
+    <text x="330" y="380">電子郵件</text><text x="655" y="380">申請群組</text>
+    <text x="330" y="474">密碼</text><text x="655" y="474">確認密碼</text>
+  </g>
+  <g fill="#081626" stroke="#315c86">
+    <rect x="330" y="302" width="285" height="48" rx="9"/><rect x="655" y="302" width="285" height="48" rx="9"/>
+    <rect x="330" y="396" width="285" height="48" rx="9"/><rect x="655" y="396" width="285" height="48" rx="9"/>
+    <rect x="330" y="490" width="285" height="48" rx="9"/><rect x="655" y="490" width="285" height="48" rx="9"/>
+  </g>
+  <rect x="330" y="565" width="610" height="52" rx="12" fill="#19a6d2"/>
+  <text x="635" y="598" text-anchor="middle" fill="#04111d" font-family="Arial,sans-serif" font-size="19" font-weight="700">送出申請</text>
+</svg>

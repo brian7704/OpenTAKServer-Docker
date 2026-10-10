@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}申請狀態 · Taya TAK{% endblock %}
+{% block content %}
+<section class="status-wrap">
+  <p class="eyebrow">APPLICATION STATUS</p><h1>申請狀態</h1>
+  <div class="status-card status-{{ application.status }}">
+    <div class="status-line"><span class="status-dot"></span><strong>{% if application.status == 'pending' %}等待管理員審核{% elif application.status == 'approved' %}申請已核准{% else %}申請未通過{% endif %}</strong></div>
+    <dl><dt>使用者帳號</dt><dd>{{ application.username }}</dd><dt>ATAK 呼號</dt><dd>{{ application.callsign }}</dd></dl>
+    {% if application.status == 'approved' and application.download_token %}<a class="primary button-link" href="{{ url_for('download', token=application.download_token) }}">下載 ATAK 完整設定包</a><p class="fine">下載連結將在核准後 72 小時失效。ZIP 請直接匯入，不要解壓縮。</p>{% elif application.status == 'rejected' %}<p>{{ application.note or '請聯絡管理員確認原因後重新申請。' }}</p>{% else %}<p>稍後重新整理本頁即可查看結果。請妥善保存這個網址。</p>{% endif %}
+  </div>
+  <a class="text-link" href="{{ url_for('index') }}#guide">查看 ATAK 連線教學</a>
+</section>
+{% endblock %}
+

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07131b">
+<meta name="description" content="{{ brand_description }}">
+<title>{% block title %}{{ brand_name }} 註冊中心{% endblock %}</title>
+<link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('brand_css') }}">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="{{ url_for('index') }}">{% if brand_logo_url %}<img src="{{ brand_logo_url }}" alt="" width="32" height="32">{% else %}<span class="brand-mark">{{ brand_short }}</span>{% endif %}<span>{{ brand_name }}</span></a>
+<nav aria-label="主要導覽">
+<a href="{{ url_for('index') }}#apply">申請帳號</a>
+<a href="{{ url_for('lookup') }}">查詢與下載</a>
+<a href="{{ url_for('index') }}#guide">連線教學</a>
+<a href="{{ url_for('admin_queue') }}">管理審核</a>
+</nav>
+</header>
+<main>
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}<div class="messages" role="status">{% for category, message in messages %}<div class="message {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+{% endwith %}
+{% block content %}{% endblock %}
+</main>
+<footer>{{ brand_tagline }} · 未經核准不會建立帳號{% if support_url and support_label %} · <a href="{{ support_url }}" rel="noopener noreferrer">{{ support_label }}</a>{% endif %}</footer>
+</body>
+</html>
