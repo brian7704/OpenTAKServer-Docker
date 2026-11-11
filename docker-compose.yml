@@ -1,9 +1,7 @@
 services:
   ots:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: ghcr.io/brian7704/opentakserver:master
+    image: ghcr.io/brian7704/opentakserver:master
+    container_name: opentakserver
     hostname: opentakserver
     restart: unless-stopped
     tty: true
