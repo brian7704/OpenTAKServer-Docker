@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: opentakserver
+    container_name: ghcr.io/brian7704/opentakserver:master
     hostname: opentakserver
     restart: unless-stopped
     tty: true
